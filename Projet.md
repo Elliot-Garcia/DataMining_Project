@@ -3,6 +3,7 @@
 - Mise en place d'un [système de recommandation] (https://en.wikipedia.org/wiki/Recommender_system) bien commenté en Python
 - Rédaction du rapport de projet.
 
+
 ### Projet
 
 
