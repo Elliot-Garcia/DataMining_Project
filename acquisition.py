@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 
 """Conversion csv en json"""
 df = pd.read_csv('pokemon.csv')
-df.to_json('pokemon.json', orient="records")
+df.to_json('pokemon.json')
 df = pd.read_json('pokemon.json')
 """Ajout colonne couleur pour chaque pokemon"""
 
@@ -47,3 +47,9 @@ if (imgfile.mode == 'P'):
         math.ceil(clusters.cluster_centers_[i][0])))
         print(clusters.cluster_centers_[i][0])
     plot.show()
+
+
+
+var = 2.4
+df['couleur']=var
+print(df)
