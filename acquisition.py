@@ -53,10 +53,14 @@ def CouleurPokemon(imgName):
         couleur2=CouleursRGBA(clusters, indexC2)
         
     if (imgfile.mode == 'P'):
-        numarray = numpy.array(imgfile.getdata(), numpy.uint8).reshape(-1,1)
+        """Permet de convertir les images en mode P en RGB"""
+        rgb_im = imgfile.convert("RGB")
+        rgb_im.save("images_test/"+imgName+".jpg")
+        imgfile = Image.open("images_test/"+imgName+".jpg")
+        numarray = numpy.array(imgfile.getdata(), numpy.uint8)
         clusters, indexC1, indexC2 = CouleursClusters(numarray)
-        couleur1=CouleursP(clusters, indexC1)
-        couleur2=CouleursP(clusters, indexC2)
+        couleur1=CouleursRGBA(clusters, indexC1)
+        couleur2=CouleursRGBA(clusters, indexC2)
     
     return couleur1, couleur2
 
@@ -75,18 +79,18 @@ for i in range(len(dfPokemon)):
     dfPokemon.loc[i,"Couleur2"] = couleur2
     print(str(i) + " : " + dfPokemon.loc[i,"Couleur1"] + " | " + dfPokemon.loc[i,"Couleur2"])
 
-dfPokemon.to_json('pokemon2.json', orient="records")
+dfPokemon.to_json('pokemon3.json', orient="records")
 """
-dfPokemon = pd.read_json('pokemon2.json')
+dfPokemon = pd.read_json('pokemon3.json')
 
 def checkPokemonColors(Name):
-    img = imread("images/"+Name+".png")
+    img = Image.open("images/"+Name+".png")
     fig, axs = plot.subplots(2, 1)
     axs[0].imshow(img)
     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
     plot.show()
 
-checkPokemonColors("aggron")
+checkPokemonColors("alomomola")
 
 """Generation d'utilisateurs"""
 
@@ -101,3 +105,22 @@ for i in range(nb_users):
     df.to_json('user'+str(i)+'.json', orient="records")
 
 """Traitement infos"""
+
+
+"""Chnangement format couleur P en mode RGB"""
+def changement_format_couleur():
+    imgfile = Image.open("images/"+"aggron"+".png")
+    if imgfile.mode == "JPEG":
+        imgfile.save("xxx.jpg")
+    # in most case, resulting jpg file is resized small one
+    elif imgfile.mode in ["RGBA", "P"]:
+        rgb_im = imgfile.convert("RGB")
+        rgb_im.save("images_test/aggron.jpg")
+        
+    #df.to_json('nouveau.json', orient="records")
+    
+
+
+#changement_format_couleur()
+
+#test()
