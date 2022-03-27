@@ -1,3 +1,4 @@
+from matplotlib.image import imread
 import numpy as np
 from numpy import NaN 
 import pandas as pd
@@ -62,6 +63,7 @@ def CouleurPokemon(imgName):
 
 """Ajout couleur prédominantes aux infos sur les images"""
 
+"""
 dfPokemon = pd.read_json('pokemon.json')
 
 dfPokemon.insert(3,"Couleur1", None)
@@ -73,4 +75,29 @@ for i in range(len(dfPokemon)):
     dfPokemon.loc[i,"Couleur2"] = couleur2
     print(str(i) + " : " + dfPokemon.loc[i,"Couleur1"] + " | " + dfPokemon.loc[i,"Couleur2"])
 
-dfPokemon.to_json('pokemon.json', orient="records")
+dfPokemon.to_json('pokemon2.json', orient="records")
+"""
+dfPokemon = pd.read_json('pokemon2.json')
+
+def checkPokemonColors(Name):
+    img = imread("images/"+Name+".png")
+    fig, axs = plot.subplots(2, 1)
+    axs[0].imshow(img)
+    axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
+    plot.show()
+
+checkPokemonColors("aggron")
+
+"""Generation d'utilisateurs"""
+
+import random as rd
+
+nb_users = 5
+for i in range(nb_users):
+    data = {}
+    df = pd.DataFrame(data)
+    for j in range(rd.randint(10,50)):
+        df = df.append(dfPokemon.loc[rd.randint(0,len(dfPokemon)-1)])
+    df.to_json('user'+str(i)+'.json', orient="records")
+
+"""Traitement infos"""
