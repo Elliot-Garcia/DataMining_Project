@@ -90,7 +90,7 @@ def checkPokemonColors(Name):
     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
     plot.show()
 
-checkPokemonColors("alomomola")
+#checkPokemonColors("alomomola")
 
 """Generation d'utilisateurs"""
 
@@ -120,7 +120,7 @@ def changement_format_couleur():
     #df.to_json('nouveau.json', orient="records")
     
 
-
+"""extraction des couleurs liké du user0"""
 def couleur_préféré_utilisateur():
     dfUser = pd.read_json('user0.json')
     print(dfUser)
@@ -128,6 +128,7 @@ def couleur_préféré_utilisateur():
     print(a)
     return a
 
+"""Conversion valeur hexa en RGB"""
 def calcul_valeur_couleur(a):
     Liste_RGB_pref=np.zeros((len(a),4),dtype=float)
     print(int(a[0][1],16))
@@ -143,16 +144,45 @@ def calcul_valeur_couleur(a):
     print(Liste_RGB_pref)
     return(Liste_RGB_pref)
 
+"""faut trouver un algo pour trouver les couleurs qui se ressemble"""
 def choix_couleur_proche(Liste_RGB_pref):
     seuil = 30
     for k in range (0,len(Liste_RGB_pref)):
         return 0
 
-a = couleur_préféré_utilisateur()
-calcul_valeur_couleur(a)
+#a = couleur_préféré_utilisateur()
+#calcul_valeur_couleur(a)
 #changement_format_couleur()
 
-#test()
-#changement_format_couleur()
+"""ESSAIE ALGO DE RECO AVEC TYPE POKEMON"""
 
-#test()
+"""COMPTEUR DE NOMBRE DE TYPE IDENTIQUE POUR UN USER"""
+
+def compteur_type_identique():
+    """extraction du type1 pour l'utilisateur 0"""
+    dfUser = pd.read_json('user0.json')
+    print(dfUser)
+    Liste_type = dfUser.iloc[:]['Type1']
+    """Compteur de type identique dans la liste"""
+    matrice_compteur = np.zeros((1,2))
+    for j in range (len(Liste_type)):
+        b=0
+        for k in range (len(matrice_compteur)):
+            if matrice_compteur[k][0] == Liste_type[j]:
+                b=1
+
+        if b==0:
+            compteur = str(Liste_type).count(Liste_type[j])
+            ajout = np.array([Liste_type[j],compteur])
+            print(compteur)
+            matrice_compteur = np.append(matrice_compteur,[ajout],axis=0)
+            
+    print(matrice_compteur)
+
+
+def choix_recommendation_type():
+    if dfPokemon.iloc['Type1']:
+        return 0
+
+compteur_type_identique()
+
