@@ -116,9 +116,9 @@ def changement_format_couleur():
 
         
     #df.to_json('nouveau.json', orient="records")
-    
+"""ESSAIE DE RECOMMANDATION PAR COULEUR JUSTE AVEC UN UTILISATEUR"""    
 
-
+"""Récupère la couleur1 des photos que l'utilisateur a aimé"""
 def couleur_préféré_utilisateur():
     dfUser = pd.read_json('user0.json')
     print(dfUser)
@@ -126,6 +126,7 @@ def couleur_préféré_utilisateur():
     print(a)
     return a
 
+"""Conversion couleur hexadécimal en décimal RGB"""
 def calcul_valeur_couleur(a):
     Liste_RGB_pref=np.zeros((len(a),4),dtype=float)
     print(int(a[0][1],16))
@@ -143,11 +144,9 @@ def calcul_valeur_couleur(a):
 
 def choix_couleur_proche(Liste_RGB_pref):
     seuil = 30
-    for k in range (0,len(Liste_RGB_pref)):
-        return 0
+    
 
 a = couleur_préféré_utilisateur()
 calcul_valeur_couleur(a)
-#changement_format_couleur()
 
-#test()
+"""ESSAIE DE RECOMMANDATION PAR TYPE DE POKEMON"""
