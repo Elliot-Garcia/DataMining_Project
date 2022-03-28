@@ -121,6 +121,38 @@ def changement_format_couleur():
     
 
 
+def couleur_préféré_utilisateur():
+    dfUser = pd.read_json('user0.json')
+    print(dfUser)
+    a = dfUser.iloc[:]['Couleur1']
+    print(a)
+    return a
+
+def calcul_valeur_couleur(a):
+    Liste_RGB_pref=np.zeros((len(a),4),dtype=float)
+    print(int(a[0][1],16))
+    for k in range (0,len(a)):
+        id = k
+        rouge = int(a[k][1:3],16)
+        vert = int(a[k][3:5],16)
+        bleu = int(a[k][5:7],16)
+        Liste_RGB_pref[k][0]=id
+        Liste_RGB_pref[k][1]=rouge
+        Liste_RGB_pref[k][2]=vert
+        Liste_RGB_pref[k][3]=bleu
+    print(Liste_RGB_pref)
+    return(Liste_RGB_pref)
+
+def choix_couleur_proche(Liste_RGB_pref):
+    seuil = 30
+    for k in range (0,len(Liste_RGB_pref)):
+        return 0
+
+a = couleur_préféré_utilisateur()
+calcul_valeur_couleur(a)
+#changement_format_couleur()
+
+#test()
 #changement_format_couleur()
 
 #test()
