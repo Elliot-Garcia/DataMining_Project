@@ -1,6 +1,4 @@
-from matplotlib.image import imread
 import numpy as np
-from numpy import NaN 
 import pandas as pd
 from PIL import Image
 import numpy
@@ -82,7 +80,6 @@ for i in range(len(dfPokemon)):
 dfPokemon.to_json('pokemon3.json', orient="records")
 """
 dfPokemon = pd.read_json('pokemon3.json')
-
 def checkPokemonColors(Name):
     img = Image.open("images/"+Name+".png")
     fig, axs = plot.subplots(2, 1)
@@ -90,7 +87,7 @@ def checkPokemonColors(Name):
     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
     plot.show()
 
-checkPokemonColors("alomomola")
+#checkPokemonColors("ponyta")
 
 """Generation d'utilisateurs"""
 
@@ -116,11 +113,41 @@ def changement_format_couleur():
     elif imgfile.mode in ["RGBA", "P"]:
         rgb_im = imgfile.convert("RGB")
         rgb_im.save("images_test/aggron.jpg")
+
         
     #df.to_json('nouveau.json', orient="records")
     
 
 
+def couleur_préféré_utilisateur():
+    dfUser = pd.read_json('user0.json')
+    print(dfUser)
+    a = dfUser.iloc[:]['Couleur1']
+    print(a)
+    return a
+
+def calcul_valeur_couleur(a):
+    Liste_RGB_pref=np.zeros((len(a),4),dtype=float)
+    print(int(a[0][1],16))
+    for k in range (0,len(a)):
+        id = k
+        rouge = int(a[k][1:3],16)
+        vert = int(a[k][3:5],16)
+        bleu = int(a[k][5:7],16)
+        Liste_RGB_pref[k][0]=id
+        Liste_RGB_pref[k][1]=rouge
+        Liste_RGB_pref[k][2]=vert
+        Liste_RGB_pref[k][3]=bleu
+    print(Liste_RGB_pref)
+    return(Liste_RGB_pref)
+
+def choix_couleur_proche(Liste_RGB_pref):
+    seuil = 30
+    for k in range (0,len(Liste_RGB_pref)):
+        return 0
+
+a = couleur_préféré_utilisateur()
+calcul_valeur_couleur(a)
 #changement_format_couleur()
 
 #test()
