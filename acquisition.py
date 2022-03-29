@@ -47,6 +47,7 @@ def CouleurPokemon(imgName):
         imgfile = Image.open("images/"+imgName+".jpg")
 
     if (imgfile.mode == 'RGBA' or imgfile.mode == 'RGB'):
+        rgb_im.save("images_test/"+imgName+".jpg")
         numarray = numpy.array(imgfile.getdata(), numpy.uint8)
         clusters, indexC1, indexC2 = CouleursClusters(numarray)
         couleur1=CouleursRGBA(clusters, indexC1)
@@ -161,7 +162,6 @@ def choix_couleur_proche(Liste_RGB_pref):
 def compteur_type_identique():
     """extraction du type1 pour l'utilisateur 0"""
     dfUser = pd.read_json('user0.json')
-    print(dfUser)
     Liste_type = dfUser.iloc[:]['Type1']
     """Compteur de type identique dans la liste"""
     matrice_compteur = np.zeros((1,2))
@@ -174,15 +174,28 @@ def compteur_type_identique():
         if b==0:
             compteur = str(Liste_type).count(Liste_type[j])
             ajout = np.array([Liste_type[j],compteur])
-            print(compteur)
             matrice_compteur = np.append(matrice_compteur,[ajout],axis=0)
-            
-    print(matrice_compteur)
+    return matrice_compteur 
 
 
-def choix_recommendation_type():
-    if dfPokemon.iloc['Type1']:
-        return 0
+print(dfPokemon.loc[dfPokemon["Type1"] == "Grass","Name"])
 
-compteur_type_identique()
+"""Affiche les types de pokemon que l'utilisateur a liké"""
+def choix_recommendation_type(matrice_compteur):
+    for k in range (0,len(matrice_compteur)):
+        for type in dfPokemon.iloc[:]['Type1']:
+            if type == matrice_compteur[k][0]:
+                name=dfPokemon.loc[dfPokemon["Type1"] == type,"Name"]
+                for Name in name:
+                    print(Name)
+                    try:
+                        imgfile = Image.open("images/"+Name+".png")
+                    except FileNotFoundError:
+                        imgfile = Image.open("images/"+Name+".jpg")
+                    fig, axs = plot.subplots(2, 1)
+                    axs[0].imshow(imgfile)
+                    axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
+                    plot.show()
 
+matrice_compteur = compteur_type_identique()
+choix_recommendation_type(matrice_compteur)
