@@ -1,3 +1,5 @@
+from tokenize import Name
+from cv2 import ROTATE_180
 from matplotlib.image import imread
 import numpy as np
 from numpy import NaN 
@@ -121,39 +123,80 @@ def changement_format_couleur():
     #df.to_json('nouveau.json', orient="records")
     
 
-"""extraction des couleurs liké du user0"""
-def couleur_préféré_utilisateur():
+
+
+"""DEBUT ALGO RECO COULEUR POKEMON"""
+
+"""Lecture like utilisateur"""
+def lecture_json_utilisateur():
     dfUser = pd.read_json('user0.json')
-    print(dfUser)
-    a = dfUser.iloc[:]['Couleur1']
-    print(a)
-    return a
+    Name = dfUser.iloc[:]['Name']
+    return Name
 
-"""Conversion valeur hexa en RGB"""
-def calcul_valeur_couleur(a):
-    Liste_RGB_pref=np.zeros((len(a),4),dtype=float)
-    print(int(a[0][1],16))
-    for k in range (0,len(a)):
-        id = k
-        rouge = int(a[k][1:3],16)
-        vert = int(a[k][3:5],16)
-        bleu = int(a[k][5:7],16)
-        Liste_RGB_pref[k][0]=id
-        Liste_RGB_pref[k][1]=rouge
-        Liste_RGB_pref[k][2]=vert
-        Liste_RGB_pref[k][3]=bleu
-    print(Liste_RGB_pref)
-    return(Liste_RGB_pref)
+"""Lecture base de donnée de pokemon on récupère les noms des pokemons"""
+def lecture_BDD():
+    dfPokemon = pd.read_json('pokemon3.json')
+    Name = dfPokemon.iloc[:]['Name']
+    return Name
 
-"""faut trouver un algo pour trouver les couleurs qui se ressemble"""
-def choix_couleur_proche(Liste_RGB_pref):
-    seuil = 30
-    for k in range (0,len(Liste_RGB_pref)):
-        return 0
+"""Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le user.json"""
+def Recup_couleur_pokemon_user(Name):
+    couleur1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    return couleur1 , couleur2
 
-#a = couleur_préféré_utilisateur()
-#calcul_valeur_couleur(a)
-#changement_format_couleur()
+
+"""Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le pokemon3.json"""
+def Recup_couleur_pokemon(Name):
+    couleur1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    return couleur1 , couleur2
+
+"""Conversion couleur hex en RGB pour la comparaison"""
+def Conversion_hex_RGB(couleur1,couleur2):
+    couleur1_RGB=[]
+    couleur2_RGB=[]
+    rouge1 = int(couleur1[1:3],16)
+    couleur1_RGB.append(rouge1)
+    vert1 = int(couleur1[3:5],16)
+    couleur1_RGB.append(vert1)
+    bleu1 = int(couleur1[5:7],16)
+    couleur1_RGB.append(bleu1)
+    rouge2 = int(couleur2[1:3],16)
+    couleur2_RGB.append(rouge2)
+    vert2 = int(couleur2[3:5],16)
+    couleur2_RGB.append(vert2)
+    bleu2 = int(couleur2[5:7],16)
+    couleur2_RGB.append(bleu2)
+    return(couleur1_RGB,couleur2_RGB)
+
+
+"""Algo qui compare les couleurs et qui ajoute dans une liste le nom des pokemons qui correspondent aux critères"""
+def couleur_aime_user():
+    Pokemon_compatible=[]
+    compteur = 0
+    Name = lecture_json_utilisateur()
+    for k in Name:
+        couleur1hex_user,couleur2hex_user = Recup_couleur_pokemon_user(k)
+        couleur1_user,couleur2_user = Conversion_hex_RGB(couleur1hex_user,couleur2hex_user)
+        Name_pok=lecture_BDD()
+        for j in Name_pok:
+            couleur1hex,couleur2hex = Recup_couleur_pokemon(j)
+            couleur1,couleur2 = Conversion_hex_RGB(couleur1hex,couleur2hex)
+            seuil = 60
+            diff = np.sqrt((couleur1[0]-couleur1_user[0])**2+(couleur1[1]-couleur1_user[1])**2+(couleur1[2]-couleur1_user[2])**2)
+            if (diff < seuil) and (j not in Pokemon_compatible):
+                Pokemon_compatible.append(j)
+                compteur+=1
+    print(Pokemon_compatible)
+    print(compteur)
+
+couleur_aime_user()
+
+"""FIN ALGO RECO COULEUR"""
+
+
+
 
 """ESSAIE ALGO DE RECO AVEC TYPE POKEMON"""
 
@@ -178,7 +221,7 @@ def compteur_type_identique():
     return matrice_compteur 
 
 
-print(dfPokemon.loc[dfPokemon["Type1"] == "Grass","Name"])
+#print(dfPokemon.loc[dfPokemon["Type1"] == "Grass","Name"])
 
 """Affiche les types de pokemon que l'utilisateur a liké"""
 def choix_recommendation_type(matrice_compteur):
@@ -197,5 +240,5 @@ def choix_recommendation_type(matrice_compteur):
                     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
                     plot.show()
 
-matrice_compteur = compteur_type_identique()
-choix_recommendation_type(matrice_compteur)
+#matrice_compteur = compteur_type_identique()
+#choix_recommendation_type(matrice_compteur)
