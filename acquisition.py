@@ -103,7 +103,7 @@ nb_users = 5
 for i in range(nb_users):
     data = {}
     df = pd.DataFrame(data)
-    for j in range(rd.randint(10,50)):
+    for j in range(rd.randint(5,20)):
         df = df.append(dfPokemon.loc[rd.randint(0,len(dfPokemon)-1)])
     df.to_json('user'+str(i)+'.json', orient="records")
 
@@ -173,7 +173,7 @@ def Conversion_hex_RGB(couleur1,couleur2):
 
 """Algo qui compare les couleurs et qui ajoute dans une liste le nom des pokemons qui correspondent aux critères"""
 def couleur_aime_user():
-    Pokemon_compatible=[]
+    Pokemon_couleur_compatible=[]
     compteur = 0
     Name = lecture_json_utilisateur()
     for k in Name:
@@ -183,17 +183,17 @@ def couleur_aime_user():
         for j in Name_pok:
             couleur1hex,couleur2hex = Recup_couleur_pokemon(j)
             couleur1,couleur2 = Conversion_hex_RGB(couleur1hex,couleur2hex)
-            seuil = 60
+            seuil = 40
             diff = np.sqrt((couleur1[0]-couleur1_user[0])**2+(couleur1[1]-couleur1_user[1])**2+(couleur1[2]-couleur1_user[2])**2)
-            if (diff < seuil) and (j not in Pokemon_compatible):
-                Pokemon_compatible.append(j)
+            if (diff < seuil) and (j not in Pokemon_couleur_compatible):
+                seuil = diff
+                Pokemon_couleur_compatible.append(j)
                 compteur+=1
-    print(Pokemon_compatible)
-    print(compteur)
+    return(Pokemon_couleur_compatible)
 
-couleur_aime_user()
 
 """FIN ALGO RECO COULEUR"""
+
 
 
 
@@ -202,26 +202,49 @@ couleur_aime_user()
 
 """COMPTEUR DE NOMBRE DE TYPE IDENTIQUE POUR UN USER"""
 
+
+"""Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le user.json"""
+def Recup_type_pokemon_user(Name):
+    type1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Type1"].iloc[0]
+    type2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Type2"].iloc[0]
+    return type1 , type2
+
+
+"""Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le pokemon3.json"""
+def recup_type_BDD(Name):
+    type1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Type1"].iloc[0]
+    type2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Type2"].iloc[0]
+    return type1 , type2
+
 def compteur_type_identique():
-    """extraction du type1 pour l'utilisateur 0"""
-    dfUser = pd.read_json('user0.json')
-    Liste_type = dfUser.iloc[:]['Type1']
-    """Compteur de type identique dans la liste"""
-    matrice_compteur = np.zeros((1,2))
-    for j in range (len(Liste_type)):
-        b=0
-        for k in range (len(matrice_compteur)):
-            if matrice_compteur[k][0] == Liste_type[j]:
-                b=1
-
-        if b==0:
-            compteur = str(Liste_type).count(Liste_type[j])
-            ajout = np.array([Liste_type[j],compteur])
-            matrice_compteur = np.append(matrice_compteur,[ajout],axis=0)
-    return matrice_compteur 
+    Pokemon_type_compatible=[]
+    compteur = 0
+    Name = lecture_json_utilisateur()
+    for k in Name:
+        type1_user,type2_user = Recup_type_pokemon_user(k)
+        Name_pok=lecture_BDD()
+        for j in Name_pok:
+            type1,type2 = recup_type_BDD(j)
+            if (type1_user == type2) and (j not in Pokemon_type_compatible):
+                Pokemon_type_compatible.append(j)
+                compteur+=1
+    return(Pokemon_type_compatible)
 
 
-#print(dfPokemon.loc[dfPokemon["Type1"] == "Grass","Name"])
+
+"""Comparaison Couleur algo et type algo"""
+
+def Pokemon_reco_final():
+    Pokemon_couleur_compatible = couleur_aime_user()
+    Pokemon_type_compatible = compteur_type_identique()
+    pokemon_final = []
+    for k in Pokemon_couleur_compatible:
+        for j in Pokemon_type_compatible:
+            if k == j:
+                pokemon_final.append(j)
+    print(pokemon_final)
+
+Pokemon_reco_final()
 
 """Affiche les types de pokemon que l'utilisateur a liké"""
 def choix_recommendation_type(matrice_compteur):
