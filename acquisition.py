@@ -68,7 +68,7 @@ def CouleurPokemon(imgName):
     return couleur1, couleur2
 
 
-"""Ajout couleur prédominantes aux infos sur les images"""
+"""LECTURE BASE DE DONNEE + AJOUT COULEUR DANS LA BASE DE DONNEE DE BASE"""
 
 """
 dfPokemon = pd.read_json('pokemon.json')
@@ -85,6 +85,8 @@ for i in range(len(dfPokemon)):
 dfPokemon.to_json('pokemon3.json', orient="records")
 """
 dfPokemon = pd.read_json('pokemon3.json')
+
+
 
 def checkPokemonColors(Name):
     img = Image.open("images/"+Name+".png")
@@ -110,7 +112,8 @@ for i in range(nb_users):
 """Traitement infos"""
 
 
-"""Chnangement format couleur P en mode RGB"""
+"""CHANGEMENT FORMAT COULEUR IMAGE MODE P EN MODE RGB"""
+
 def changement_format_couleur():
     imgfile = Image.open("images/"+"aggron"+".png")
     if imgfile.mode == "JPEG":
@@ -246,6 +249,9 @@ def Pokemon_reco_final():
 
 Pokemon_reco_final()
 
+
+"""Fonction pas aboutie c'était un test"""
+
 """Affiche les types de pokemon que l'utilisateur a liké"""
 def choix_recommendation_type(matrice_compteur):
     for k in range (0,len(matrice_compteur)):
@@ -262,6 +268,3 @@ def choix_recommendation_type(matrice_compteur):
                     axs[0].imshow(imgfile)
                     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
                     plot.show()
-
-#matrice_compteur = compteur_type_identique()
-#choix_recommendation_type(matrice_compteur)
