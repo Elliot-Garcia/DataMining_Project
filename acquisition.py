@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 
 
 """Conversion csv en json"""
-df = pd.read_csv('https://www.kaggle.com/datasets/vishalsubbiah/pokemon-images-and-types?select=pokemon.csv')
+df = pd.read_csv('pokemon.csv')
 print(df)
 df.to_json('pokemon.json')
 """Ajout colonne couleur pour chaque pokemon"""
@@ -125,7 +125,51 @@ def changement_format_couleur(nomPok):
         
     #df.to_json('nouveau.json', orient="records")
     
+def recup_16_couleurs_predominantes_pokemons():
+    dfUser = pd.read_json('pokemon3.json')
+    couleur_RGB=[]
+    couleur1 = dfUser.iloc[:]['Couleur1']
+    print(couleur1[1][1])
+    for j in range (len(couleur1)):
+        couleur1_RGB=[]
+        rouge1 = int(couleur1[j][1:3],16)
+        couleur1_RGB.append(rouge1)
+        vert1 = int(couleur1[j][3:5],16)
+        couleur1_RGB.append(vert1)
+        bleu1 = int(couleur1[j][5:7],16)
+        couleur1_RGB.append(bleu1)
+        couleur_RGB.append(couleur1_RGB)
+        couleur1_RGB=[]
+    numarray = numpy.array(couleur_RGB, numpy.uint8)
+    clusters = KMeans(n_clusters = 16)
+    clusters.fit(numarray)
+    npbins = numpy.arange(0, 17)
+    histogram = numpy.histogram(clusters.labels_, bins=npbins)
+    print(histogram[0])
+    print(clusters)
 
+    index_max=numpy.where(histogram[0] ==numpy.amax(histogram[0]))
+    print(index_max)
+    labels = numpy.unique(clusters.labels_)
+    barlist = plot.bar(labels, histogram[0])
+    print(clusters.cluster_centers_)
+    for i in range(16):
+        barlist[i].set_color('#%02x%02x%02x' % (
+        math.ceil(clusters.cluster_centers_[i][0]), 
+            math.ceil(clusters.cluster_centers_[i][1]),
+        math.ceil(clusters.cluster_centers_[i][2])))
+    plot.show()
+
+
+
+
+def recup_couleur_pokemon_user():
+    dfUser = pd.read_json('user0.json')
+    couleur1 = dfUser.iloc[:]['Couleur1']
+    couleur2 = dfUser.iloc[:]['Couleur2']
+    for k in range (len(couleur1)):
+        couleur1_user,couleur2_user=Conversion_hex_RGB(couleur1[k],couleur2[k])
+        print(couleur1_user)
 
 
 """DEBUT ALGO RECO COULEUR POKEMON"""
@@ -268,5 +312,7 @@ def choix_recommendation_type(matrice_compteur):
                     axs[0].imshow(imgfile)
                     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
                     plot.show()
+
+recup_couleur_pokemon_user()
 
 checkPokemonColors("weedle")
