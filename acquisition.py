@@ -11,6 +11,8 @@ from sklearn.cluster import KMeans
 
 
 """Conversion csv en json"""
+url = 'https://www.kaggle.com/datasets/vishalsubbiah/pokemon-images-and-types?select=pokemon.csv'
+url2='https://www.kaggle.com/datasets/vishalsubbiah/pokemon-images-and-types?select=images'
 df = pd.read_csv('pokemon.csv')
 print(df)
 df.to_json('pokemon.json')
