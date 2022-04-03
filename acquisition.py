@@ -12,7 +12,8 @@ from sklearn.cluster import KMeans
 
 
 """Conversion csv en json"""
-df = pd.read_csv('pokemon.csv')
+df = pd.read_csv('https://www.kaggle.com/datasets/vishalsubbiah/pokemon-images-and-types?select=pokemon.csv')
+print(df)
 df.to_json('pokemon.json')
 """Ajout colonne couleur pour chaque pokemon"""
 
@@ -98,7 +99,7 @@ def checkPokemonColors(Name):
 #checkPokemonColors("alomomola")
 
 """Generation d'utilisateurs"""
-
+"""
 import random as rd
 
 nb_users = 5
@@ -108,7 +109,7 @@ for i in range(nb_users):
     for j in range(rd.randint(5,20)):
         df = df.append(dfPokemon.loc[rd.randint(0,len(dfPokemon)-1)])
     df.to_json('user'+str(i)+'.json', orient="records")
-
+"""
 """Traitement infos"""
 
 
@@ -145,14 +146,14 @@ def lecture_BDD():
 """Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le user.json"""
 def Recup_couleur_pokemon_user(Name):
     couleur1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
-    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]
     return couleur1 , couleur2
 
 
 """Récupération couleur pokemon qui corresponde aux noms qu'il y a dans le pokemon3.json"""
 def Recup_couleur_pokemon(Name):
     couleur1 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
-    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0]
+    couleur2 = dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]
     return couleur1 , couleur2
 
 """Conversion couleur hex en RGB pour la comparaison"""
@@ -247,7 +248,7 @@ def Pokemon_reco_final():
                 pokemon_final.append(j)
     print(pokemon_final)
 
-Pokemon_reco_final()
+#Pokemon_reco_final()
 
 
 """Fonction pas aboutie c'était un test"""
