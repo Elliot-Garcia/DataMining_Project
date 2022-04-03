@@ -1,13 +1,17 @@
 import math
 import numpy as np
 from sklearn.cluster import KMeans
-from PIL import Image
+from sklearn import tree
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+import graphviz
+import pydotplus
+from IPython.display import Image, display
 
 """Etiquetage automatique des données en fonction de leurs couleurs prédominantes"""
 
 """Couleurs prédominantes"""
-
+"""
 def CouleursClusters(numarray):
     clusters = KMeans(n_clusters = 3)
     clusters.fit(numarray)
@@ -46,7 +50,8 @@ def CouleurPokemon(imgName):
         couleur2=CouleursRGBA(clusters, indexC2)
         
     if (imgfile.mode == 'P'):
-        """Permet de convertir les images en mode P en RGB"""
+        #Permet de convertir les images en mode P en RGB
+        
         rgb_im = imgfile.convert("RGB")
         rgb_im.save("images_test/"+imgName+".jpg")
         imgfile = Image.open("images_test/"+imgName+".jpg")
@@ -57,7 +62,8 @@ def CouleurPokemon(imgName):
     
     return couleur1, couleur2
 
-"""Stockage des étiquettes couleur1 et couleur2 dans pokemon.json"""
+#Stockage des étiquettes couleur1 et couleur2 dans pokemon.json
+
 
 dfPokemon = pd.read_json('pokemon.json')
 
@@ -72,7 +78,8 @@ for i in range(len(dfPokemon)):
 
 dfPokemon.to_json('pokemon.json', orient="records")
 
-"""Génération des utilisateurs"""
+#Génération des utilisateurs
+
 
 import random as rd
 
@@ -84,7 +91,7 @@ for i in range(nb_users):
         df = df.append(dfPokemon.loc[rd.randint(0,len(dfPokemon)-1)])
     df.to_json('user'+str(i)+'.json', orient="records")
 
-"""Classification"""
+#Classification
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn import tree
@@ -108,72 +115,53 @@ with open("label.json",'r') as jsonTab:
 
 with open("user.json",'r') as jsonUser:
     dataUser = json.load(jsonUser)
+"""
 
+def Type2CaseNull(i):
+    if(dfPokemon.iloc[i]['Type2'] != None): return dfPokemon.iloc[i]['Type2']
+    else: return 'None'
 
-data=[]
-result=[]
-auteur_vu=[]
-dataTabCustom = dataTab #on crée une copie de notre liste de tableaux, qui représentera les tableaux "non vus" par l'utilisateur
-for lien in dataUser[0]["likes"]: #on construit un dataframe qui va servir à l'algo de classification : on commence par les tableaux likés par l'utilisateur (result = 1)
-    for tableau in dataTab:
-        if lien == tableau["lien"]:
-            tag = max(tableau["tags"].items(), key=operator.itemgetter(1))[0] #l'algo ne prend pas de liste de tags en paramètre: on choisit donc le tag le plus utilisé sur le tableau
-            data.append([tableau["auteur"],tableau["format"],tag])
-            result.append(1)
-            auteur_vu.append(tableau["auteur"])
-            dataTabCustom.remove(tableau)
-            
+dfPokemon = pd.read_json('pokemon3.json')
+dfFavorite = pd.read_json('user0.json')
+data = [[dfPokemon.iloc[i]['Type1'], Type2CaseNull(i), dfPokemon.iloc[i]['Couleur1'], dfPokemon.iloc[i]['Couleur2']] for i in range(len(dfPokemon))]
 
-for lien in dataUser[0]["unlikes"]:#on fait la même chose avec les tableaux vu et non likés (result = -1)
-    for tableau in dataTab:
-        if lien == tableau["lien"]:
-            tag = max(tableau["tags"].items(), key=operator.itemgetter(1))[0]
-            data.append([tableau["auteur"],tableau["format"],tag])
-            result.append(-1)
-            auteur_vu.append(tableau["auteur"])
-            dataTabCustom.remove(tableau)
+result = ['NotFavorite' for _ in range(len(dfPokemon))]
+for pokemonFavori in dfFavorite.iloc[:]['Name']:
+    result[dfPokemon[dfPokemon['Name'] == pokemonFavori].index.values[0]] = 'Favorite'
 
+#creating dataframes
+dataframe = pd.DataFrame(data, columns=['Type1', 'Type2', 'Couleur1', 'Couleur2'])
+resultframe = pd.DataFrame(result, columns=['Favorite'])
 
-
-dataframe = pd.DataFrame(data, columns=['auteur', 'format', 'tags'])#construction des dataframes
-resultframe = pd.DataFrame(result, columns=['like'])
-
-le1 = LabelEncoder() #encodage des labels
-dataframe['auteur'] = le1.fit_transform(dataframe['auteur'])
+#generating numerical labels
+le1 = LabelEncoder()
+dataframe['Type1'] = le1.fit_transform(dataframe['Type1'])
 
 le2 = LabelEncoder()
-dataframe['format'] = le2.fit_transform(dataframe['format'])
+dataframe['Type2'] = le2.fit_transform(dataframe['Type2'])
 
 le3 = LabelEncoder()
-dataframe['tags'] = le3.fit_transform(dataframe['tags'])
+dataframe['Couleur1'] = le3.fit_transform(dataframe['Couleur1'])
 
 le4 = LabelEncoder()
-resultframe['like'] = le4.fit_transform(resultframe['like'])
+dataframe['Couleur2'] = le4.fit_transform(dataframe['Couleur2'])
 
-#On utilise les classifieurs "arbres"
+le5 = LabelEncoder()
+resultframe['Favorite'] = le5.fit_transform(resultframe['Favorite'])
+
+#Use of decision tree classifiers
 dtc = tree.DecisionTreeClassifier()
 dtc = dtc.fit(dataframe, resultframe)
 
-recommandation = [] #on initialise une liste de tableaux recommandés
-non_recommandation=[] #on initialise une liste de tableaux non-recommandés
-while len(recommandation)<10:
-    tab = random.choice(dataTabCustom)
-    if tab["auteur"] not in auteur_vu: #l'algo de prédiction plante si on lui présente un tableau dont l'auteur est n'a pas été vu par l'utilisateur.
-        continue
-    prediction = dtc.predict([ #on réalise une prédiction pour savoir si le tableau plaira à l'utilisateur
-            [le1.transform([tab["auteur"]])[0], le2.transform([tab["format"]])[0],
-            le3.transform([max(tableau["tags"].items(), key=operator.itemgetter(1))[0]])[0]]])
-    if prediction == 1: 
-        recommandation.append(tab)
-    else:
-        non_recommandation.append(tab)
+dot_data = tree.export_graphviz(dtc, out_file=None,
+        feature_names=dataframe.columns,
+        filled=True, rounded=True, 
+        class_names =
+        le5.inverse_transform(
+        resultframe.Favorite.unique())
+        )
+graph = graphviz.Source(dot_data)
 
-for tab in recommandation: #on ajoute une comaraison par couleurs des tableaux, afin d'avoir la recommandation la plus précise possible
-    tab["indice_couleur"]=ComparaisonCouleur(dataUser[0]["couleurPref"],tab["couleur"])
-
-dataframe=pd.DataFrame(recommandation)
-dataframe.drop(columns=["auteur",'largeur','hauteur','format','tags','unlikes','couleur'],inplace=True)
-dataframe.sort_values(by="indice_couleur",inplace=True)
-if dataframe.iloc[0]['indice_couleur']>200 :
-    dataframe.sort_values(by="likes",inplace=True)
-print(dataframe.iloc[0]['lien'])
+pydot_graph = pydotplus.graph_from_dot_data(dot_data)
+img = Image(pydot_graph.create_png())
+display(img)

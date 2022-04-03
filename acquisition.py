@@ -100,13 +100,24 @@ def checkPokemonColors(Name):
 """Generation d'utilisateurs"""
 """
 import random as rd
+dfPokemonFav = pd.read_json('pokemon3.json')
+dfPokemonFav.insert(5,"Favorite", None)
 
 nb_users = 5
 for i in range(nb_users):
     data = {}
+    
     df = pd.DataFrame(data)
+
     for j in range(rd.randint(5,20)):
-        df = df.append(dfPokemon.loc[rd.randint(0,len(dfPokemon)-1)])
+        k = rd.randint(0,len(dfPokemonFav)-1)
+        df = df.append(dfPokemonFav.loc[k])
+        df.loc[k]['Favorite'] = 'Favorite'
+        dfPokemonFav.drop(k)
+    for j in range(rd.randint(5,20)):
+        k =rd.randint(0,len(dfPokemonFav)-1)
+        df = df.append(dfPokemonFav.loc[k])
+        df.loc[k]['Favorite'] = 'NotFavorite'
     df.to_json('user'+str(i)+'.json', orient="records")
 """
 """Traitement infos"""
