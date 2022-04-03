@@ -1,5 +1,4 @@
 from tokenize import Name
-from cv2 import ROTATE_180
 from matplotlib.image import imread
 import numpy as np
 from numpy import NaN 
@@ -115,10 +114,10 @@ for i in range(nb_users):
 
 """CHANGEMENT FORMAT COULEUR IMAGE MODE P EN MODE RGB"""
 
-def changement_format_couleur():
-    imgfile = Image.open("images/"+"aggron"+".png")
+def changement_format_couleur(nomPok):
+    imgfile = Image.open("images/"+nomPok+".png")
     if imgfile.mode == "JPEG":
-        imgfile.save("xxx.jpg")
+        imgfile.save("images/"+nomPok+".jpg")
     # in most case, resulting jpg file is resized small one
     elif imgfile.mode in ["RGBA", "P"]:
         rgb_im = imgfile.convert("RGB")
@@ -132,8 +131,8 @@ def changement_format_couleur():
 """DEBUT ALGO RECO COULEUR POKEMON"""
 
 """Lecture like utilisateur"""
-def lecture_json_utilisateur():
-    dfUser = pd.read_json('user0.json')
+def lecture_json_utilisateur(user):
+    dfUser = pd.read_json(user)
     Name = dfUser.iloc[:]['Name']
     return Name
 
@@ -179,7 +178,7 @@ def Conversion_hex_RGB(couleur1,couleur2):
 def couleur_aime_user():
     Pokemon_couleur_compatible=[]
     compteur = 0
-    Name = lecture_json_utilisateur()
+    Name = lecture_json_utilisateur('user0.json')
     for k in Name:
         couleur1hex_user,couleur2hex_user = Recup_couleur_pokemon_user(k)
         couleur1_user,couleur2_user = Conversion_hex_RGB(couleur1hex_user,couleur2hex_user)
@@ -223,7 +222,7 @@ def recup_type_BDD(Name):
 def compteur_type_identique():
     Pokemon_type_compatible=[]
     compteur = 0
-    Name = lecture_json_utilisateur()
+    Name = lecture_json_utilisateur('user0.json')
     for k in Name:
         type1_user,type2_user = Recup_type_pokemon_user(k)
         Name_pok=lecture_BDD()
@@ -269,3 +268,5 @@ def choix_recommendation_type(matrice_compteur):
                     axs[0].imshow(imgfile)
                     axs[1].pie([1,1], colors=[dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur1"].iloc[0], dfPokemon.loc[dfPokemon["Name"] == Name,"Couleur2"].iloc[0]])
                     plot.show()
+
+checkPokemonColors("weedle")
