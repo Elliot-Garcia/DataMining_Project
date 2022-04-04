@@ -60,6 +60,8 @@ recommandation = [] #on initialise une liste de tableaux recommandés
 non_recommandation=[] #on initialise une liste de tableaux non-recommandés
 
 dfPokemon = pd.read_json('pokemon3.json')
+for Pokemon in pd.read_json('user0.json'):
+    dfPokemon.drop(dfPokemon.iloc[Pokemon])
 
 
 while len(recommandation)<10:
